@@ -66,14 +66,14 @@ You need to analyze your models and define their natural keys.
 You can infer their natural keys usually from unique fields (and or `unique_together`).
 
 Fields that are defined as unique or in `unique_together` can be defined by 
-only using the field name  e.g. a Language is related to a Country,
-in Language definition, 
-the `unique_together` is usually the Language's ISO 639-1 and the Country.
+only using the field name  e.g. a Language is related to a Country.
+In Language definition, 
+the `unique_together` is usually the Country + the Language's ISO 639-1.
 
 In code it'll look something like this
 
 ```python
-unique_together = (('iso_code', 'country'),)
+unique_together = (( 'country', 'code'),)
 ```
 
 Notice that `country` in unique_together itself is _abstract_.
@@ -82,7 +82,7 @@ In context of `unique_together` it will be their ID, but ID is not natural key.
 Country's natural key should be their ISO 2 code.
 
 So we can infer that natural key of Language, programmatically, is 
-the Language's ISO 639-1 + the Country's ISO 2 code.
+the the Country's ISO 2 code. + Language's ISO 639-1 
 
 It'll look like this when you implement in code
 ```python
