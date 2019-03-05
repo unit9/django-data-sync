@@ -1,8 +1,10 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
 
 import data_sync
+from data_sync import GrabExportError
 
 
 class TimeStampedModel(models.Model):
@@ -47,7 +49,15 @@ class DataPull(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        data_sync.run(self.data_source.env_url)
+
+        # TODO move this to signals
+        try:
+            data_sync.run(self.data_source.env_url)
+        except GrabExportError as e:
+            raise ValidationError(
+                'Failed to get data from source. Most likely you have '
+                'invalid Data Source URL. Please refer to docs'
+            )
 
     def __str__(self):
         return 'Sync from {} at {}'.format(

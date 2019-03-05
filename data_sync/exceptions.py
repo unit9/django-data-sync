@@ -1,0 +1,2 @@
+class GrabExportError(Exception):
+    pass

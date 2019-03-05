@@ -41,7 +41,6 @@ add `data_sync` to your `INSTALLED_APPS`
     ...
     
     'data_sync',
-    
     ....
     ....
 ```
@@ -51,7 +50,12 @@ Run migrate
 ```text
 python manage.py migrate data_sync
 ```
-    
+
+Add to urlpatterns. Please do take note of the prefix URLs.
+Usually we include this in `/api` prefix.
+```python
+    path('', include('data_sync.urls')),
+```
 ## Preface
 
 Data Sync works by making use of natural key.
@@ -160,12 +164,26 @@ DataSyncEnhancedManager just adds a `get_by_natural_key method` and no other
 else.
 
 
-### The Sync
-Visit admin, add a Data Source (data source's URL is a full URL including 
-scheme and should not include endslash!).
-If you testing locally, you also need to include the port.
+### Data Source
 
-To do a sync, simply create a data pull.
+Data Source holds information about an environment from which you want your
+data to be synced.
+
+The URL is dependant on where and how you include the `data_sync.urls` at
+installation phase.
+
+For example, if you include `data_sync.urls` in your `api` App urlpatterns,
+then the URL in data source must be appended with your `api` URL which might
+looks something like this `https://example.com/api`.
+
+If you include `data_sync.urls` in your root `urls`, then Data Source URL will
+looks like this `https://example.com`.
+
+Do not include endslash.
+
+### The Sync
+
+To do a sync, simply create a Data Pull
 
 ## Compatibility
 

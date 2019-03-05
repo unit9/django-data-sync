@@ -7,6 +7,7 @@ from django.core import serializers
 from django.core.files import File
 
 import data_sync.managers
+from data_sync.exceptions import GrabExportError
 from data_sync.registration import register_model
 
 import requests
@@ -33,9 +34,12 @@ def pull(data_source_url):
     :param data_source_url: env_url from DataSource
     :return: tuple of exported data
     """
-    url = data_source_url + '/api/export'
-    data = requests.get(url).json()  # will convert to python list of strings
-
+    url = data_source_url + '/export'
+    try:
+        # will convert to python list of serialized objects strings
+        data = requests.get(url).json()
+    except Exception as e:
+        raise GrabExportError()
     return data
 
 
