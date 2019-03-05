@@ -51,8 +51,9 @@ Run migrate
 python manage.py migrate data_sync
 ```
 
-Add to urlpatterns. Please do take note of the prefix URLs.
-Usually we include this in `/api` prefix.
+Add to urlpatterns. Please do take note of the prefix URLs it will be used 
+later.
+e.g. most likely we will include this in `api` App, thus the prefix is `/api`.
 ```python
     path('', include('data_sync.urls')),
 ```
