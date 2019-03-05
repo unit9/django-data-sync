@@ -1,19 +1,21 @@
 ##### This document is still in WIP
 # Django Data Sync
 
-Enables you to sync insensitive data between environments with the same
-Django backends.
+Enables you to sync insensitive data between environments with any Django 
+backends (as long the model definitions are the same) directly from admin 
+interface.
 
 ## Features
 
 - enables you to sync insensitive data between the same Django environments 
-    directly from admin interface
+  (as long the model definitions are the same) directly from admin interface 
 - relation fields are supported (ManyToMany needs to be tested)
 
 TO BE ADDED
 
 - add support for ImageField and FileField
-- support multiple tasks queues, current plan is to support GAE TaskQueue and dramatiq
+- support multiple tasks queues, current plan is to support GAE TaskQueue and 
+    dramatiq (default is sync)
 
 MIGHT GET ADDED
 
@@ -87,7 +89,7 @@ class Language(models.Model):
 In essence, natural key is usually combination of unique fields and or 
 `unique_together`, but it needs to be more _precise_.
 
-## Tutorial
+## Usage
 
 To get Data Sync working, you need to register the models that want to be 
 synced.
