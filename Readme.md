@@ -174,11 +174,11 @@ The URL is dependant on where and how you include the `data_sync.urls` at
 installation phase.
 
 For example, if you include `data_sync.urls` in your `api` App urlpatterns,
-then the URL in data source must be appended with your `api` URL which might
-looks something like this `https://example.com/api`.
+then the URL in data source must be appended with your `api` URL.
+Thus it might look something like this `https://example.com/api`.
 
 If you include `data_sync.urls` in your root `urls`, then Data Source URL will
-looks like this `https://example.com`.
+look like this `https://example.com`.
 
 Do not include endslash.
 
