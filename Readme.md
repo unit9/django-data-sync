@@ -56,10 +56,11 @@ Data Sync works by making use of natural key.
 So I heavily recommend to read [django docs on this topic](https://docs.djangoproject.com/en/2.1/topics/serialization/#natural-keys) before going further.
 
 You need to analyze your models and define their natural keys.
-You can infer their natural keys usually from unique fields (and or unique_together).
+You can infer their natural keys usually from unique fields (and or `unique_together`).
 
-Fields that are defined in unique or unique_together can be defined by only using the field name 
-e.g. a Language is related to a Country, in Language definition, 
+Fields that are defined as unique or in `unique_together` can be defined by 
+only using the field name  e.g. a Language is related to a Country,
+in Language definition, 
 the `unique_together` is usually the Language's ISO 639-1 and the Country.
 
 In code it'll look something like this
@@ -83,8 +84,8 @@ class Language(models.Model):
         return (self.country.code, self.code,)
 ```
 
-In essence, natural key is usually unique fields and or unique_together,
-but it needs to be more _precise_.
+In essence, natural key is usually combination of unique fields and or 
+`unique_together`, but it needs to be more _precise_.
 
 ## Tutorial
 
@@ -136,7 +137,7 @@ class Copy(models.Model):
     ....
 ```
 
-#### @data_sync.register_model
+### @data_sync.register_model
 
 Here you need to define your natural key (read Preface for further topic).  
 If natural key has value in related field, you need to use . (dot) notation.
@@ -144,7 +145,7 @@ If natural key has value in related field, you need to use . (dot) notation.
 You can also pass argument to fields if you want to limit which fields
 that you want to be synced.
 
-#### DataSyncEnhancedManager
+### DataSyncEnhancedManager
 
 It looks like manager initialization is done at class loading.
 So adding custom manager programmatically might be considered hacky 
@@ -156,7 +157,7 @@ attribute name i.e. `objects` to use DataSyncEnhancedManager.
 DataSyncEnhancedManager just adds a get_by_natural_key method and no other else.
 
 
-#### The Sync
+### The Sync
 Visit admin, add a Data Source (data source's URL is a full URL including 
 scheme and should not include endslash!).
 If you testing locally, you also need to include the port.
