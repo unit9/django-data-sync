@@ -82,7 +82,7 @@ In context of `unique_together` it will be their ID, but ID is not natural key.
 Country's natural key should be their ISO 2 code.
 
 So we can infer that natural key of Language, programmatically, is 
-the the Country's ISO 2 code. + Language's ISO 639-1 
+the Country's ISO 2 code + the Language's ISO 639-1 
 
 It'll look like this when you implement in code
 ```python
@@ -92,7 +92,7 @@ class Language(models.Model):
 ```
 
 In essence, natural key is usually combination of unique fields and or 
-`unique_together`, but it needs to be more _precise_.
+`unique_together`, but it needs to be more _verbose_.
 
 ## Usage
 
