@@ -77,40 +77,6 @@ def django_sync(pulled_data):
         Model.objects.exclude(id__in=ids).delete()
 
 
-def subtitles_sync(pulled_data):
-    Locale = apps.get_model('api.Locale')
-    for obj in pulled_data:
-        try:
-            locale = Locale.objects.get(
-                country__code=obj['country_code'],
-                code=obj['locale_code']
-            )
-        except Locale.DoesNotExist:
-            continue
-
-        for i in range(1, 5):
-            field_name = 'srt_file_chapter_{}'.format(i)
-
-            if not obj[field_name]:
-                continue
-
-            base64_string = obj[field_name].encode()
-            file_bytes = BytesIO(b64decode(base64_string))
-            new_file = File(file_bytes)
-
-            getattr(
-                locale, field_name
-            ).save(
-                # use the synced file name
-                getattr(locale, field_name).name.split('/')[-1],
-                new_file,
-                save=False
-            )
-            new_file.close()
-
-        locale.save()
-
-
 def run(data_source_base_url, is_generate_compare_data=False):
     """
     Run the data sync process, returns compare data to be saved to DataPull
