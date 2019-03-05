@@ -144,8 +144,8 @@ class Copy(models.Model):
 Here you need to define your natural key (read Preface for further topic).  
 If natural key has value in related field, you need to use . (dot) notation.
 
-You can also pass argument to fields if you want to limit which fields
-that you want to be synced.
+You can also pass argument to `fields` parameter if you want to limit which 
+fields that you want to be synced.
 
 ### DataSyncEnhancedManager
 
@@ -156,7 +156,8 @@ So adding custom manager programmatically might be considered hacky
 For now, I'm afraid you must define custom manager, with the default 
 attribute name i.e. `objects` to use DataSyncEnhancedManager.
 
-DataSyncEnhancedManager just adds a get_by_natural_key method and no other else.
+DataSyncEnhancedManager just adds a `get_by_natural_key method` and no other 
+else.
 
 
 ### The Sync
