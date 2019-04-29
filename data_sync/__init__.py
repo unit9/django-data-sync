@@ -50,15 +50,18 @@ def export():
     """
     data = []
     for Model in data_sync.registration.sort_dependencies():
-        objects = serializers.serialize(
+        objects = Model.objects.all()
+        if not objects:
+            continue
+
+        serialized_objects = serializers.serialize(
             'json',
-            Model.objects.all(),
+            objects,
             use_natural_foreign_keys=True,
             use_natural_primary_keys=True,
             fields=Model._data_sync_fields
         )
-        if objects:
-            data.append(objects)
+        data.append(serialized_objects)
     return data
 
 
