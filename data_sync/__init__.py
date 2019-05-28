@@ -1,8 +1,6 @@
-from base64 import b64decode
+import json
 from collections import defaultdict
-from io import BytesIO
 
-from django.apps import apps
 from django.core import serializers
 from django.core.files import File
 
@@ -29,12 +27,26 @@ That's why there's no logic to handle changed objects
 
 def pull(data_source_url):
     """
-    In a sync, you want to sync both what's in the DB and the media files
-    that's why it's coupled
     :param data_source_url: env_url from DataSource
     :return: tuple of exported data
     """
     url = data_source_url + '/export'
+    try:
+        # will convert to python list of serialized objects strings
+        data = requests.get(url).json()
+    except Exception as e:
+        raise GrabExportError()
+    return data
+
+
+def pull_files(data_source_url):
+    """
+    The returned data is NOT django's deserializer frinedly, since
+    the value of file fields are URLs instead of just the filenames
+    :param data_source_url: env_url from DataSource
+    :return: tuple of exported data
+    """
+    url = data_source_url + '/export/files'
     try:
         # will convert to python list of serialized objects strings
         data = requests.get(url).json()
@@ -59,7 +71,7 @@ def export():
             objects,
             use_natural_foreign_keys=True,
             use_natural_primary_keys=True,
-            fields=Model._data_sync_fields
+            fields=Model._data_sync_fields + Model._data_sync_file_fields
         )
         data.append(serialized_objects)
     return data
@@ -82,6 +94,41 @@ def django_sync(pulled_data):
         Model.objects.exclude(id__in=ids).delete()
 
 
+def files_sync(data_source_base_url):
+    """
+    Download all the files from source env to target env and save it
+    """
+    media_base_url = requests.get(
+        '{}/export/files/configuration'.format(
+            data_source_base_url
+        )
+    )
+
+    for Model in data_sync.registration.sort_dependencies():
+        if not Model._data_sync_file_fields:
+            continue
+
+        objects = Model.objects.all()
+
+        for obj in objects:
+            for file_field_name in Model._data_sync_file_fields:
+                file_field = getattr(obj, file_field_name, None)
+                if file_field is None:
+                    continue
+
+                # just checking if it's run in local, won't use the .url
+                if 'http' in file_field.url:
+                    r = requests.get('{}/{}'.format(media_base_url, file_field.name))  # noqa
+                    bytes_content = r.content
+                else:
+                    with open(file_field.path, 'rb') as opened_file:
+                        bytes_content = opened_file.read()
+
+                new_file = File(bytes_content)
+                file_field.save(file_field.name, new_file, save=True)
+                new_file.close()
+
+
 def run(data_source_base_url, is_generate_compare_data=False):
     """
     Run the data sync process, returns compare data to be saved to DataPull
@@ -93,6 +140,7 @@ def run(data_source_base_url, is_generate_compare_data=False):
         raise NotImplementedError
     else:
         django_sync(pulled_data)
+        files_sync(data_source_base_url)
         compare_data = None
 
     return compare_data

@@ -33,8 +33,13 @@ class DataSource(TimeStampedModel):
     )
     env_url = models.URLField(
         verbose_name='environment base URL',
-        help_text=('Environment base URL where the data will be pulled from. '
-                   'Scheme included and do not include endslash')
+        help_text=(
+            'Environment base URL where the data will be pulled from. '
+            'Scheme included and do not include endslash.'
+            'This value is very dependant on the urls.py setup, refers to '
+            'django_data_sync docs for further explanation.'
+            "Usually it's https://example.com/api"
+        )
     )
 
     def __str__(self):
