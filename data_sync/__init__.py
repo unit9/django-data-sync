@@ -102,7 +102,7 @@ def files_sync(data_source_base_url):
         '{}/export/files/configuration'.format(
             data_source_base_url
         )
-    )
+    ).json()['media_base_url']
 
     for Model in data_sync.registration.sort_dependencies():
         if not Model._data_sync_file_fields:
