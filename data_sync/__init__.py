@@ -1,5 +1,5 @@
-import json
 from collections import defaultdict
+from io import BytesIO
 
 from django.core import serializers
 from django.core.files import File
@@ -116,13 +116,8 @@ def files_sync(data_source_base_url):
                 if file_field is None:
                     continue
 
-                # just checking if it's run in local, won't use the .url
-                if 'http' in file_field.url:
-                    r = requests.get('{}/{}'.format(media_base_url, file_field.name))  # noqa
-                    bytes_content = r.content
-                else:
-                    with open(file_field.path, 'rb') as opened_file:
-                        bytes_content = opened_file.read()
+                r = requests.get('{}/{}'.format(media_base_url, file_field.name))  # noqa
+                bytes_content = BytesIO(r.content)
 
                 new_file = File(bytes_content)
                 file_field.save(file_field.name, new_file, save=True)
