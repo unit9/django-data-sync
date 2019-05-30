@@ -1,8 +1,13 @@
+import json
+
 from django.conf import settings
+from django.core.validators import URLValidator
 from django.http import JsonResponse
 from django.views import View
 
 import data_sync
+
+url_validator = URLValidator()
 
 
 class DataSyncExportAPIView(View):
@@ -32,3 +37,29 @@ class DataSyncExportFilesConfigurationView(View):
             'media_base_url': base_url
         }
         return JsonResponse(data)
+
+
+class RunDataSyncGAECloudTasks(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except Exception:
+            return JsonResponse(
+                data={'errors': ['could not parse JSON']}, status=400
+            )
+
+        data_source_base_url = data.get('data_source_base_url', None)
+
+        if data_source_base_url is None:
+            return JsonResponse(
+                data={'errors': ['data_source_base_url is not in data']}
+            )
+
+        try:
+            url_validator(data_source_base_url)
+        except Exception:
+            return JsonResponse(
+                data={'errors': ['data_source_base_url is not a valid URL']}
+            )
+
+        data_sync.run(data_source_base_url)

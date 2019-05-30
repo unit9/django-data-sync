@@ -1,10 +1,15 @@
+import os
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from google.cloud import tasks_v2
 
 import data_sync
 from data_sync import GrabExportError
+from data_sync import runtime_utils
 
 
 class TimeStampedModel(models.Model):
@@ -52,10 +57,25 @@ class DataPull(TimeStampedModel):
 
     compare_data = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    status = models.CharField(
+        default='SUCCEED',
+        max_length=20,
+        choices=(
+            ('SUCCEED', 'SUCCEED'),
+            ('IN_PROGRESS', 'IN_PROGRESS'),
+            ('FAILED', 'FAILED')
+        )
+    )
 
-        # TODO move this to signals
+    def save(self, *args, **kwargs):
+        if runtime_utils.is_in_gae():
+            client = tasks_v2.CloudTasksClient()
+            parent = client.queue_path(
+                os.getenv('GAE_APPLICATION'),
+                settings.DATA_SYNC_GAE_LOCATION,
+                settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
+            )
+
         try:
             data_sync.run(self.data_source.env_url)
         except GrabExportError as e:
@@ -63,6 +83,7 @@ class DataPull(TimeStampedModel):
                 'Failed to get data from source. Most likely you have '
                 'invalid Data Source URL. Please refer to docs'
             )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return 'Sync from {} at {}'.format(

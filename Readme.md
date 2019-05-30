@@ -13,8 +13,8 @@ interface.
 
 TO BE ADDED
 
-- add support for ImageField and FileField
-- support multiple tasks queues, current plan is to support GAE TaskQueue and 
+~~- add support for ImageField and FileField~~ DONE
+- support multiple tasks queues, current plan is to support GCP Cloud Tasks and 
     dramatiq (default is sync)
 
 MIGHT GET ADDED
@@ -24,8 +24,8 @@ MIGHT GET ADDED
 ## Disclaimer (IMPORTANT)
 
 The original codebase run in production projects twice.
-This is an adaptation of the original codebase, and haven't yet gone
-into production.
+This is an adaptation of the original codebase into a decoupled library, thus
+haven't yet gone into production.
 
 ## Installation
 
@@ -186,13 +186,18 @@ Do not include endslash.
 
 To do a sync, simply create a Data Pull
 
+### Worker tasks
+
+When the code is deployed to GAE (and GAE only, flex and kube not supported yet),
+`data_sync` automatically uses Cloud Tasks with the queue id of `data_sync`.
+
 ## Compatibility
 
-Python 3.4 and up, Django 2.0 and up
+Python 3.7, Django 2.1 and up
 
 ## Testing
 
-No tests yet.
+No automated tests (yet.....).
 
 To test locally, you can spawn two django servers with different ports and 
 different database and set the Data Source accordingly.
