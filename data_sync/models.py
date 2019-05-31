@@ -1,8 +1,10 @@
-import os
+import json
+import logging
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 from google.cloud import tasks_v2
@@ -10,6 +12,9 @@ from google.cloud import tasks_v2
 import data_sync
 from data_sync import GrabExportError
 from data_sync import runtime_utils
+
+
+logger = logging.getLogger('django.data_sync')
 
 
 class TimeStampedModel(models.Model):
@@ -64,17 +69,59 @@ class DataPull(TimeStampedModel):
             ('SUCCEED', 'SUCCEED'),
             ('IN_PROGRESS', 'IN_PROGRESS'),
             ('FAILED', 'FAILED')
-        )
+        ),
+        help_text='status can become stuck/stale at IN_PROGRESS, if you wait '
+                  'long enough but the status does not change from IN_PROGRESS'
+                  ', please do another sync'
     )
 
+    @staticmethod
+    def _create_run_data_sync_task(data_pull_id, data_source_base_url):
+        """
+        Calls self version to run data sync
+        """
+        client = tasks_v2.CloudTasksClient()
+
+        parent = client.queue_path(
+            settings.DATA_SYNC_GAE_APPLICATION,
+            settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
+            settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
+        )
+
+        url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GAE_APPLICATION}'  # noqa
+        relative_data_sync_url = reverse('data_sync:run_gae_cloud_tasks')
+        url += relative_data_sync_url
+
+        data = {
+            'token': settings.DATA_SYNC_TOKEN.encode(),
+            'data_pull_id': data_pull_id,
+            'data_source_base_url': data_source_base_url
+        }
+        encoded_data = json.dumps(data).encode()
+
+        task = {
+            'http_request': {
+                'http_method': 'POST',
+                'url': url,
+                'body': encoded_data
+            },
+        }
+
+        response = client.create_task(parent, task)
+
+        logger.info(
+            f'Data pull task initiated. ID: {data_pull_id} '
+            f'SOURCE_URL: {data_source_base_url}'
+        )
+
+        return response
+
     def save(self, *args, **kwargs):
+        self.status = 'IN_PROGRESS'
+        super().save(*args, **kwargs)
+
         if runtime_utils.is_in_gae():
-            client = tasks_v2.CloudTasksClient()
-            parent = client.queue_path(
-                os.getenv('GAE_APPLICATION'),
-                settings.DATA_SYNC_GAE_LOCATION,
-                settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
-            )
+            self._create_run_data_sync_task(self.id, self.data_source.env_url)
 
         try:
             data_sync.run(self.data_source.env_url)
@@ -83,7 +130,6 @@ class DataPull(TimeStampedModel):
                 'Failed to get data from source. Most likely you have '
                 'invalid Data Source URL. Please refer to docs'
             )
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return 'Sync from {} at {}'.format(

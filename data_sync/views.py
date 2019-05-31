@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views import View
 
 import data_sync
+from data_sync import models
 
 url_validator = URLValidator()
 
@@ -42,24 +43,39 @@ class DataSyncExportFilesConfigurationView(View):
 class RunDataSyncGAECloudTasks(View):
     def post(self, request):
         try:
-            data = json.loads(request.body)
+            data = json.loads(request.body.decode())
         except Exception:
             return JsonResponse(
                 data={'errors': ['could not parse JSON']}, status=400
             )
 
-        data_source_base_url = data.get('data_source_base_url', None)
-
-        if data_source_base_url is None:
+        if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
             return JsonResponse(
-                data={'errors': ['data_source_base_url is not in data']}
+                data={'errors': ['token, data_pull_id, data_source_base_url are needed']},  # noqa
+                status=400
             )
 
         try:
-            url_validator(data_source_base_url)
+            data_pull = models.DataPull.objects.get(id=data['data_pull_id'])
         except Exception:
+            return JsonResponse(
+                data={'errors': ['Invalid data_pull_id']}
+            )
+
+        try:
+            url_validator(data['data_source_base_url'])
+        except Exception:
+            data_pull.status = 'FAILED'
+            data_pull.save()
             return JsonResponse(
                 data={'errors': ['data_source_base_url is not a valid URL']}
             )
+        try:
+            data_sync.run(data['data_source_base_url'])
+        except Exception:
+            data_pull.status = 'FAILED'
+        else:
+            data_pull.status = 'SUCCEED'
+        data_pull.save()
 
-        data_sync.run(data_source_base_url)
+        return JsonResponse(data={'status': 'ok'}, status=201)
