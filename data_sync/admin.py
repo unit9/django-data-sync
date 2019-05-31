@@ -32,4 +32,4 @@ class DataPullAdmin(TimeStampedModelAdminMixin, admin.ModelAdmin):
         if obj:
             return 'data_source', 'status'
         else:
-            return ()
+            return 'status',

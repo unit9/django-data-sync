@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 
-namespace = 'data_sync'
+app_name = 'data_sync'
 
 urlpatterns = [
     path('data_sync/export', views.DataSyncExportAPIView.as_view(), name='export'),

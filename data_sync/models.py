@@ -1,10 +1,10 @@
 import json
 import logging
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from django.utils import timezone
 
 from google.cloud import tasks_v2
@@ -89,8 +89,19 @@ class DataPull(TimeStampedModel):
         )
 
         url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GAE_APPLICATION}'  # noqa
-        relative_data_sync_url = reverse('data_sync:run_gae_cloud_tasks')
-        url += relative_data_sync_url
+
+        # since data sync urls can be registered inside another naemspace
+        # we can't reverse it reliably
+        # however, we can infer it from the data_source_base_url
+        parsed_data_source_base_url = urlparse(data_source_base_url)
+
+        project_dependent_namespace = parsed_data_source_base_url.path
+
+        url += project_dependent_namespace
+
+        # TODO make this as a constant
+
+        url += '/data_sync/run/gae/cloudtasks'
 
         data = {
             'token': settings.DATA_SYNC_TOKEN.encode(),
