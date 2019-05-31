@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from google.cloud import tasks_v2
+from google.cloud import tasks_v2beta3
 
 import data_sync
 from data_sync import GrabExportError
@@ -80,7 +80,7 @@ class DataPull(TimeStampedModel):
         """
         Calls self version to run data sync
         """
-        client = tasks_v2.CloudTasksClient()
+        client = tasks_v2beta3.CloudTasksClient()
 
         parent = client.queue_path(
             settings.DATA_SYNC_GAE_APPLICATION,
