@@ -22,7 +22,7 @@ class DataSyncConfig(AppConfig):
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_LOCATION', 'europe-west1')
 
         settings.setdefault('DATA_SYNC_GAE_APPLICATION', os.getenv('GAE_APPLICATION', ''))  # noqa
-        settings.setdefault('DATA_SYNC_GAE_VERSIONM', os.getenv('GAE_VERSIION', ''))  # noqa
+        settings.setdefault('DATA_SYNC_GAE_VERSION', os.getenv('GAE_VERSION', ''))  # noqa
 
         if settings['DEBUG']:
             token = os.getenv('DATA_SYNC_TOKEN', '')
