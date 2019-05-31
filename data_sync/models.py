@@ -104,6 +104,8 @@ class DataPull(TimeStampedModel):
         url += '/data_sync/run/gae/cloudtasks'
 
         data = {
+            # use custom token temporarily :))))
+            # GCP recommends OIDC
             'token': settings.DATA_SYNC_TOKEN.encode(),
             'data_pull_id': data_pull_id,
             'data_source_base_url': data_source_base_url
