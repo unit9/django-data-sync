@@ -22,8 +22,6 @@ class DataPullAdmin(TimeStampedModelAdminMixin, admin.ModelAdmin):
     actions = None
     list_per_page = 20
 
-    readonly_fields = ('status',)
-
     def get_queryset(self, request):
         return models.DataPull.objects.all().select_related('data_source')
 
@@ -32,6 +30,6 @@ class DataPullAdmin(TimeStampedModelAdminMixin, admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return 'data_source',
+            return 'data_source', 'status'
         else:
             return ()
