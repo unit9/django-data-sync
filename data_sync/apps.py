@@ -1,6 +1,10 @@
+import logging
 import os
 
 from django.apps import AppConfig
+
+
+logger = logging.getLogger('django.data_sync')
 
 
 class DataSyncConfig(AppConfig):
@@ -20,6 +24,9 @@ class DataSyncConfig(AppConfig):
 
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_QUEUE_ID', 'data-sync')
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_LOCATION', 'europe-west1')
+
+        gae_application = os.getenv('GAE_APPLICATION', '')
+        logger.debug(gae_application)
 
         settings.setdefault('DATA_SYNC_GAE_APPLICATION', os.getenv('GAE_APPLICATION', ''))  # noqa
         settings.setdefault('DATA_SYNC_GAE_VERSION', os.getenv('GAE_VERSION', ''))  # noqa
