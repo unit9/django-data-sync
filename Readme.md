@@ -13,7 +13,7 @@ interface.
 
 TO BE ADDED
 
-~~- add support for ImageField and FileField~~ DONE
+- ~~add support for ImageField and FileField~~ DONE
 - support multiple tasks queues, current plan is to support GCP Cloud Tasks and 
     dramatiq (default is sync)
 
@@ -131,7 +131,8 @@ class Language(models.Model):
 
 @data_sync.register_model(
     natural_key=['language.country.code', 'language.code', 'key'],
-    fields=('value', 'key', 'language')
+    fields=('value', 'key', 'language'),
+    file_fields=('thumbnail',)
 )
 class Copy(models.Model):
     objects = data_sync.managers.DataSyncEnhancedManager()
@@ -140,6 +141,7 @@ class Copy(models.Model):
     value = models.TextField()
     key = models.CharField(max_length=255)
     default = models.TextField()
+    thumbnail = models.ImageField()
     ....
     ....
 ```
@@ -151,6 +153,8 @@ If natural key has value in related field, you need to use . (dot) notation.
 
 You can also pass argument to `fields` parameter if you want to limit which 
 fields that you want to be synced.
+
+To add FileField into Data Sync, add them into `file_fields` parameter.
 
 ### DataSyncEnhancedManager
 
