@@ -83,12 +83,12 @@ class DataPull(TimeStampedModel):
         client = tasks_v2beta3.CloudTasksClient()
 
         parent = client.queue_path(
-            settings.DATA_SYNC_GAE_APPLICATION,
+            settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT,
             settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
             settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
         )
 
-        url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GAE_APPLICATION}'  # noqa
+        url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}'  # noqa
 
         # since data sync urls can be registered inside another naemspace
         # we can't reverse it reliably
