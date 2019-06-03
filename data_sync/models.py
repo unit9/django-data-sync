@@ -12,6 +12,7 @@ from google.cloud import tasks_v2beta3
 import data_sync
 from data_sync import GrabExportError
 from data_sync import runtime_utils
+from data_sync import url_constants
 
 
 logger = logging.getLogger('django.data_sync')
@@ -90,7 +91,7 @@ class DataPull(TimeStampedModel):
 
         url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}'  # noqa
 
-        # since data sync urls can be registered inside another naemspace
+        # since data sync urls can be registered inside another namespace
         # we can't reverse it reliably
         # however, we can infer it from the data_source_base_url
         parsed_data_source_base_url = urlparse(data_source_base_url)
@@ -99,9 +100,7 @@ class DataPull(TimeStampedModel):
 
         url += project_dependent_namespace
 
-        # TODO make this as a constant
-
-        url += '/data_sync/run/gae/cloudtasks'
+        url += f'/{url_constants.RUN_DATA_SYNC_GAE_CLOUD_TASKS}'
 
         data = {
             # use custom token temporarily :))))
@@ -135,14 +134,14 @@ class DataPull(TimeStampedModel):
 
         if runtime_utils.is_in_gae():
             self._create_run_data_sync_task(self.id, self.data_source.env_url)
-
-        try:
-            data_sync.run(self.data_source.env_url)
-        except GrabExportError as e:
-            raise ValidationError(
-                'Failed to get data from source. Most likely you have '
-                'invalid Data Source URL. Please refer to docs'
-            )
+        else:
+            try:
+                data_sync.run(self.data_source.env_url)
+            except GrabExportError as e:
+                raise ValidationError(
+                    'Failed to get data from source. Most likely you have '
+                    'invalid Data Source URL. Please refer to docs'
+                )
 
     def __str__(self):
         return 'Sync from {} at {}'.format(

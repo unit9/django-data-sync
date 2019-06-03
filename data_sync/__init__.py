@@ -7,6 +7,7 @@ from django.core.files import File
 import data_sync.managers
 from data_sync.exceptions import GrabExportError
 from data_sync.registration import register_model
+from data_sync import url_constants
 
 import requests
 
@@ -30,7 +31,7 @@ def pull(data_source_url):
     :param data_source_url: env_url from DataSource
     :return: tuple of exported data
     """
-    url = data_source_url + '/export'
+    url = f'{data_source_url}/{url_constants.EXPORT}'
     try:
         # will convert to python list of serialized objects strings
         data = requests.get(url).json()
@@ -46,7 +47,7 @@ def pull_files(data_source_url):
     :param data_source_url: env_url from DataSource
     :return: tuple of exported data
     """
-    url = data_source_url + '/export/files'
+    url = f'{data_source_url}/{url_constants.EXPORT_FILES_CONFIGURATION}'
     try:
         # will convert to python list of serialized objects strings
         data = requests.get(url).json()
