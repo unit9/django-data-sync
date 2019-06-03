@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 
@@ -46,18 +47,29 @@ class DataSyncExportFilesConfigurationView(View):
 
 class RunDataSyncGAECloudTasks(View):
     def post(self, request):
-        logger.debug(
-            f'Incoming data pull Cloud Tasks request. Data {request.body.decode()}'  # noqa
-        )
         errors = {}
         try:
             data = json.loads(request.body.decode())
         except Exception:
             errors = {'errors': ['could not parse JSON']}
+            return JsonResponse(data=errors, status=400)
+
+        debugging_data = copy.deepcopy(data)
+        debugging_data.pop('token', None)
+        logger.debug(
+            f'Incoming data pull Cloud Tasks request. Data {data}'  # noqa
+        )
 
         if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
             errors = {'errors': ['token, data_pull_id, data_source_base_url are needed']}  # noqa
 
+        is_token_valid = data['token'] != settings.DATA_SYNC_TOKEN
+        if is_token_valid:
+            return JsonResponse(
+                data={'errors': 'invalid token or headers'}, status=403
+            )
+
+        data_pull = None
         try:
             data_pull = models.DataPull.objects.get(id=data['data_pull_id'])
         except Exception:
@@ -65,7 +77,12 @@ class RunDataSyncGAECloudTasks(View):
 
         if errors:
             logger.warning(errors)
+            if data_pull:
+                data_pull.status = 'FAILED'
+                data_pull.save()
             return JsonResponse(data=errors, status=400)
+
+        assert data_pull
 
         try:
             url_validator(data['data_source_base_url'])
