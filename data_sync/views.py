@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.conf import settings
 from django.core.validators import URLValidator
@@ -9,6 +10,9 @@ import data_sync
 from data_sync import models
 
 url_validator = URLValidator()
+
+
+logger = logging.getLogger('django.data_sync')
 
 
 class DataSyncExportAPIView(View):
@@ -42,33 +46,38 @@ class DataSyncExportFilesConfigurationView(View):
 
 class RunDataSyncGAECloudTasks(View):
     def post(self, request):
+        logger.debug(
+            f'Incoming data pull Cloud Tasks request. Data {request.body.decode()}'  # noqa
+        )
         try:
             data = json.loads(request.body.decode())
         except Exception:
-            return JsonResponse(
-                data={'errors': ['could not parse JSON']}, status=400
-            )
+            errors = {'errors': ['could not parse JSON']}
+            logger.warning(errors)
+            return JsonResponse(data=errors, status=400)
 
         if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
-            return JsonResponse(
-                data={'errors': ['token, data_pull_id, data_source_base_url are needed']},  # noqa
-                status=400
-            )
+            errors = {'errors': ['token, data_pull_id, data_source_base_url are needed']}  # noqa
+            logger.warning(errors)
+            return JsonResponse(data=errors, status=400)
 
         try:
             data_pull = models.DataPull.objects.get(id=data['data_pull_id'])
         except Exception:
-            return JsonResponse(
-                data={'errors': ['Invalid data_pull_id']}
-            )
+            errors = {'errors': ['Invalid data_pull_id']}
+            logger.warning(errors)
+            return JsonResponse(data=errors, status=400)
 
         try:
             url_validator(data['data_source_base_url'])
         except Exception:
             data_pull.status = 'FAILED'
             data_pull.save()
+
+            errors = {'errors': ['data_source_base_url is not a valid URL']}
+            logger.warning(errors)
             return JsonResponse(
-                data={'errors': ['data_source_base_url is not a valid URL']}
+                data=errors, status=400
             )
         try:
             data_sync.run(data['data_source_base_url'])
@@ -78,4 +87,4 @@ class RunDataSyncGAECloudTasks(View):
             data_pull.status = 'SUCCEED'
         data_pull.save()
 
-        return JsonResponse(data={'status': 'ok'}, status=201)
+        return JsonResponse(data={'status': 'created'}, status=201)
