@@ -100,9 +100,7 @@ def files_sync(data_source_base_url):
     Download all the files from source env to target env and save it
     """
     media_base_url = requests.get(
-        '{}/export/files/configuration'.format(
-            data_source_base_url
-        )
+        f'{data_source_base_url}/{url_constants.EXPORT_FILES_CONFIGURATION}'
     ).json()['media_base_url']
 
     for Model in data_sync.registration.sort_dependencies():

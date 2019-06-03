@@ -64,13 +64,15 @@ class DataPull(TimeStampedModel):
     compare_data = models.TextField(blank=True, null=True)
 
     status = models.CharField(
-        default='SUCCEED',
+        default='',
         max_length=20,
         choices=(
+            ('', ''),
             ('SUCCEED', 'SUCCEED'),
             ('IN_PROGRESS', 'IN_PROGRESS'),
             ('FAILED', 'FAILED')
         ),
+        blank=True,
         help_text='status can become stuck/stale at IN_PROGRESS, if you wait '
                   'long enough but the status does not change from IN_PROGRESS'
                   ', please do another sync'
@@ -135,19 +137,22 @@ class DataPull(TimeStampedModel):
         return response
 
     def save(self, *args, **kwargs):
-        self.status = 'IN_PROGRESS'
-        super().save(*args, **kwargs)
+        self.status = 'IN_PROGRESS' if not self.status else self.status
 
-        if runtime_utils.is_in_gae():
-            self._create_run_data_sync_task(self.id, self.data_source.env_url)
-        else:
-            try:
-                data_sync.run(self.data_source.env_url)
-            except GrabExportError as e:
-                raise ValidationError(
-                    'Failed to get data from source. Most likely you have '
-                    'invalid Data Source URL. Please refer to docs'
-                )
+        if self.status == 'IN_PROGRESS':
+            if runtime_utils.is_in_gae():
+                self._create_run_data_sync_task(self.id, self.data_source.env_url)
+            else:
+                try:
+                    data_sync.run(self.data_source.env_url)
+                except GrabExportError as e:
+                    raise ValidationError(
+                        'Failed to get data from source. Most likely you have '
+                        'invalid Data Source URL. Please refer to docs'
+                    )
+                self.status = 'SUCCEED'
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return 'Sync from {} at {}'.format(
