@@ -96,7 +96,10 @@ class DataPull(TimeStampedModel):
 
         project_dependent_namespace = parsed_data_source_base_url.path
 
-        url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}'  # noqa
+        url = (
+            f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-'
+            f'{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}.appspot.com'
+        )
 
         url += project_dependent_namespace
 
@@ -126,7 +129,7 @@ class DataPull(TimeStampedModel):
             f'SOURCE_URL: {data_source_base_url} '
             f'TASK URL: {url} '
             f'TASK DATA: {task} '
-            f'CLOUD TASKS RESPONSE: {response.__dict__}'
+            f'CLOUD TASKS RESPONSE: {response}'
         )
 
         return response
