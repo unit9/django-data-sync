@@ -138,6 +138,7 @@ class DataPull(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.status = 'IN_PROGRESS' if not self.status else self.status
+        super().save(*args, **kwargs)
 
         if self.status == 'IN_PROGRESS':
             if runtime_utils.is_in_gae():
@@ -151,8 +152,7 @@ class DataPull(TimeStampedModel):
                         'invalid Data Source URL. Please refer to docs'
                     )
                 self.status = 'SUCCEED'
-
-        super().save(*args, **kwargs)
+                self.save()
 
     def __str__(self):
         return 'Sync from {} at {}'.format(

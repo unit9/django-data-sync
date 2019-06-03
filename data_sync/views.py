@@ -49,22 +49,21 @@ class RunDataSyncGAECloudTasks(View):
         logger.debug(
             f'Incoming data pull Cloud Tasks request. Data {request.body.decode()}'  # noqa
         )
+        errors = {}
         try:
             data = json.loads(request.body.decode())
         except Exception:
             errors = {'errors': ['could not parse JSON']}
-            logger.warning(errors)
-            return JsonResponse(data=errors, status=400)
 
         if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
             errors = {'errors': ['token, data_pull_id, data_source_base_url are needed']}  # noqa
-            logger.warning(errors)
-            return JsonResponse(data=errors, status=400)
 
         try:
             data_pull = models.DataPull.objects.get(id=data['data_pull_id'])
         except Exception:
             errors = {'errors': ['Invalid data_pull_id']}
+
+        if errors:
             logger.warning(errors)
             return JsonResponse(data=errors, status=400)
 
