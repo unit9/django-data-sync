@@ -125,7 +125,8 @@ class DataPull(TimeStampedModel):
             f'Data pull task initiated. ID: {data_pull_id} '
             f'SOURCE_URL: {data_source_base_url} '
             f'TASK URL: {url} '
-            f'TASK DATA: {task}'
+            f'TASK DATA: {task} '
+            f'CLOUD TASKS RESPONSE: {response.__dict__}'
         )
 
         return response
