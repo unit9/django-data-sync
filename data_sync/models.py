@@ -89,14 +89,14 @@ class DataPull(TimeStampedModel):
             settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
         )
 
-        url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}'  # noqa
-
         # since data sync urls can be registered inside another namespace
         # we can't reverse it reliably
         # however, we can infer it from the data_source_base_url
         parsed_data_source_base_url = urlparse(data_source_base_url)
 
         project_dependent_namespace = parsed_data_source_base_url.path
+
+        url = f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}'  # noqa
 
         url += project_dependent_namespace
 
@@ -124,6 +124,8 @@ class DataPull(TimeStampedModel):
         logger.info(
             f'Data pull task initiated. ID: {data_pull_id} '
             f'SOURCE_URL: {data_source_base_url}'
+            f'TASK URL: {url}',
+            f'TASK DATA: {task}'
         )
 
         return response

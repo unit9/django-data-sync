@@ -21,6 +21,10 @@ class DataSourceAdmin(TimeStampedModelAdminMixin, admin.ModelAdmin):
 class DataPullAdmin(TimeStampedModelAdminMixin, admin.ModelAdmin):
     actions = None
     list_per_page = 20
+    list_display = (
+        'data_source',
+        'status'
+    )
 
     def get_queryset(self, request):
         return models.DataPull.objects.all().select_related('data_source')
