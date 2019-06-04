@@ -5,6 +5,8 @@ from django.core.serializers import sort_dependencies as _sort_dependencies
 
 from data_sync.managers import DataSyncEnhancedManager
 
+
+# should be a tuple
 registered_models = []
 
 

@@ -91,8 +91,17 @@ def django_sync(pulled_data):
             obj.save()
             processed_ids[obj.object.__class__].append(obj.object.id)
 
+    registered_models = data_sync.registration.sort_dependencies()
     for Model, ids in processed_ids.items():
         Model.objects.exclude(id__in=ids).delete()
+
+        # remove processed model, if there's still any
+        # then no objects present in that model in the source env
+        registered_models.remove(Model)
+
+    if registered_models:
+        for Model in registered_models:
+            Model.objects.all().delete()
 
 
 def files_sync(data_source_base_url):
