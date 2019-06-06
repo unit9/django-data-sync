@@ -120,7 +120,10 @@ class DataPull(TimeStampedModel):
             'http_request': {
                 'http_method': 'POST',
                 'url': url,
-                'body': encoded_data
+                'body': encoded_data,
+                'oidc_token': {
+                    'service_account_email': settings.DATA_SYNC_SERVICE_ACCOUNT_EMAIL  # noqa
+                }
             },
         }
 

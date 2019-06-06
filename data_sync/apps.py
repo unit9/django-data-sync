@@ -34,3 +34,5 @@ class DataSyncConfig(AppConfig):
             # mandatory if non debug to fill the token
             token = os.getenv('DATA_SYNC_TOKEN')
         settings.setdefault('DATA_SYNC_TOKEN', token)
+
+        settings.setdefault('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', '')

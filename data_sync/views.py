@@ -57,7 +57,7 @@ class RunDataSyncGAECloudTasks(View):
         debugging_data = copy.deepcopy(data)
         debugging_data.pop('token', None)
         logger.debug(
-            f'Incoming data pull Cloud Tasks request. Data {data}'  # noqa
+            f'Incoming data pull Cloud Tasks request. Data {data} Headers: {request.headers}'  # noqa
         )
 
         if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
