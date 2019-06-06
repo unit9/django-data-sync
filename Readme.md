@@ -168,7 +168,7 @@ attribute name i.e. `objects` to use DataSyncEnhancedManager.
 DataSyncEnhancedManager just adds a `get_by_natural_key method` and no other 
 else.
 
-### Mandatory configuration (WIP)
+### Settings and Configuration (WIP)
 
 DATA_SYNC_FORCE_SYNC
 
@@ -176,11 +176,16 @@ DATA_SYNC_CLOUD_TASKS_QUEUE_ID
 
 DATA_SYNC_CLOUD_TASKS_LOCATION
 
-GOOGLE_CLOUD_PROJECT
+DATA_SYNC_GOOGLE_CLOUD_PROJECT GOOGLE_CLOUD_PROJECT
 
-DATA_SYNC_GAE_VERSION
+DATA_SYNC_GAE_VERSION GAE_VERSION
+
+#### Mandatory
+
+DATA_SYNC_SERVICE_ACCOUNT_EMAIL
 
 DATA_SYNC_TOKEN
+
 ### Data Source
 
 Data Source holds information about an environment from which you want your
