@@ -13,6 +13,7 @@ setup(
     install_requires=[
         'requests',
         'google-cloud-tasks==1.1.0',
+        'cryptography==2.7',
         'PyJWT==1.7.1'
     ],
     zip_safe=False,
