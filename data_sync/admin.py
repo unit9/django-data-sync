@@ -22,6 +22,7 @@ class DataPullAdmin(TimeStampedModelAdminMixin, admin.ModelAdmin):
     actions = None
     list_per_page = 20
     list_display = (
+        'time_created',
         'data_source',
         'status'
     )
