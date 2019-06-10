@@ -184,8 +184,6 @@ DATA_SYNC_GAE_VERSION GAE_VERSION
 
 DATA_SYNC_SERVICE_ACCOUNT_EMAIL
 
-DATA_SYNC_TOKEN
-
 ### Data Source
 
 Data Source holds information about an environment from which you want your

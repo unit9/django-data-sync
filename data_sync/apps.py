@@ -28,11 +28,4 @@ class DataSyncConfig(AppConfig):
         settings.setdefault('DATA_SYNC_GOOGLE_CLOUD_PROJECT', os.getenv('GOOGLE_CLOUD_PROJECT', ''))  # noqa
         settings.setdefault('DATA_SYNC_GAE_VERSION', os.getenv('GAE_VERSION', ''))  # noqa
 
-        if settings['DEBUG']:
-            token = os.getenv('DATA_SYNC_TOKEN', '')
-        else:
-            # mandatory if non debug to fill the token
-            token = os.getenv('DATA_SYNC_TOKEN')
-        settings.setdefault('DATA_SYNC_TOKEN', token)
-
         settings.setdefault('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', os.getenv('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', ''))  # noqa

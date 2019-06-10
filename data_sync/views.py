@@ -1,6 +1,7 @@
 import copy
 import json
 import logging
+import traceback
 
 from django.conf import settings
 from django.core.validators import URLValidator
@@ -8,7 +9,7 @@ from django.http import JsonResponse
 from django.views import View
 
 import data_sync
-from data_sync import models
+from data_sync import models, oidc
 
 url_validator = URLValidator()
 
@@ -63,12 +64,6 @@ class RunDataSyncGAECloudTasks(View):
         if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
             errors = {'errors': ['token, data_pull_id, data_source_base_url are needed']}  # noqa
 
-        is_token_valid = data['token'] != settings.DATA_SYNC_TOKEN
-        if is_token_valid:
-            return JsonResponse(
-                data={'errors': 'invalid token or headers'}, status=403
-            )
-
         data_pull = None
         try:
             data_pull = models.DataPull.objects.get(id=data['data_pull_id'])
@@ -95,12 +90,35 @@ class RunDataSyncGAECloudTasks(View):
             return JsonResponse(
                 data=errors, status=400
             )
+
+        oidc_token = request.headers.get('Authorization', '')
+        if not oidc_token:
+            errors = {'errors': 'Authorization not present in headers, malicious request!'}  # noqa
+            logger.warning(errors)
+            return JsonResponse(data=errors, status=401)
+
+        oidc_token = oidc_token.split(' ')[1]  # strip Bearer
+
+        try:
+            oidc.Google.validate(
+                token=oidc_token,
+                audience=models.DataPull.get_cloud_task_handler_url(
+                    data['data_source_base_url']
+                )
+            )
+        except Exception as e:
+            traceback.format_exc()
+            logger.error(e)
+            errors = {'errors': 'Failed to validate OIDC'}
+            return JsonResponse(data=errors, status=400)
+
         try:
             data_sync.run(data['data_source_base_url'])
         except Exception:
             data_pull.status = 'FAILED'
         else:
             data_pull.status = 'SUCCEED'
+
         data_pull.save()
 
         return JsonResponse(data={'status': 'created'}, status=201)

@@ -79,17 +79,8 @@ class DataPull(TimeStampedModel):
     )
 
     @staticmethod
-    def _create_run_data_sync_task(data_pull_id, data_source_base_url):
-        """
-        Calls self version to run data sync
-        """
-        client = tasks_v2beta3.CloudTasksClient()
-
-        parent = client.queue_path(
-            settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT,
-            settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
-            settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
-        )
+    def get_cloud_task_handler_url(data_source_base_url):
+        # WON'T WORK LOCALLY
 
         # since data sync urls can be registered inside another namespace
         # we can't reverse it reliably
@@ -107,19 +98,33 @@ class DataPull(TimeStampedModel):
 
         url += f'/{url_constants.RUN_DATA_SYNC_GAE_CLOUD_TASKS}'
 
+        return url
+
+    @staticmethod
+    def _create_run_data_sync_task(data_pull_id, data_source_base_url):
+        """
+        Calls self version to run data sync
+        """
+        client = tasks_v2beta3.CloudTasksClient()
+
+        parent = client.queue_path(
+            settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT,
+            settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
+            settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
+        )
+
         data = {
-            # use custom token temporarily :))))
-            # GCP recommends OIDC
-            'token': settings.DATA_SYNC_TOKEN,
             'data_pull_id': data_pull_id,
             'data_source_base_url': data_source_base_url
         }
         encoded_data = json.dumps(data).encode()
 
+        target_url = DataPull.get_cloud_task_handler_url(data_source_base_url)
+
         task = {
             'http_request': {
                 'http_method': 'POST',
-                'url': url,
+                'url': target_url,
                 'body': encoded_data,
                 'oidc_token': {
                     'service_account_email': settings.DATA_SYNC_SERVICE_ACCOUNT_EMAIL  # noqa
@@ -132,7 +137,7 @@ class DataPull(TimeStampedModel):
         logger.info(
             f'Data pull task initiated. ID: {data_pull_id} '
             f'SOURCE_URL: {data_source_base_url} '
-            f'TASK URL: {url} '
+            f'TASK URL: {target_url} '
             f'CLOUD TASKS RESPONSE: {response}'
         )
 

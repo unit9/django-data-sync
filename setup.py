@@ -12,7 +12,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
-        'google-cloud-tasks==1.1.0'
+        'google-cloud-tasks==1.1.0',
+        'PyJWT==1.7.1'
     ],
     zip_safe=False,
     python_requires=">=3.7",
