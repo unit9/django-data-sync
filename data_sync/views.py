@@ -56,13 +56,12 @@ class RunDataSyncGAECloudTasks(View):
             return JsonResponse(data=errors, status=400)
 
         debugging_data = copy.deepcopy(data)
-        debugging_data.pop('token', None)
         logger.debug(
             f'Incoming data pull Cloud Tasks request. Data {data} Headers: {request.headers}'  # noqa
         )
 
-        if not all(key in data for key in ('token', 'data_pull_id', 'data_source_base_url')):  # noqa
-            errors = {'errors': ['token, data_pull_id, data_source_base_url are needed']}  # noqa
+        if not all(key in data for key in ('data_pull_id', 'data_source_base_url')):  # noqa
+            errors = {'errors': ['data_pull_id, data_source_base_url are needed']}  # noqa
 
         data_pull = None
         try:
