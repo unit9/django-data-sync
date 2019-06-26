@@ -125,6 +125,9 @@ def files_sync(data_source_base_url):
                     continue
 
                 r = requests.get('{}/{}'.format(media_base_url, file_field.name))  # noqa
+                if not str(r.status_code).startswith('2'):
+                    continue
+
                 bytes_content = BytesIO(r.content)
 
                 new_file = File(bytes_content)
