@@ -113,7 +113,9 @@ class RunDataSyncGAECloudTasks(View):
 
         try:
             data_sync.run(data['data_source_base_url'])
-        except Exception:
+        except Exception as e:
+            traceback.format_exc()
+            logger.error(e)
             data_pull.status = 'FAILED'
         else:
             data_pull.status = 'SUCCEED'
