@@ -27,5 +27,6 @@ class DataSyncConfig(AppConfig):
 
         settings.setdefault('DATA_SYNC_GOOGLE_CLOUD_PROJECT', os.getenv('GOOGLE_CLOUD_PROJECT', ''))  # noqa
         settings.setdefault('DATA_SYNC_GAE_VERSION', os.getenv('GAE_VERSION', ''))  # noqa
+        settings.setdefault('DATA_SYNC_GAE_SERVICE', os.getenv('GAE_SERVICE')),
 
         settings.setdefault('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', os.getenv('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', ''))  # noqa

@@ -89,8 +89,18 @@ class DataPull(TimeStampedModel):
 
         project_dependent_namespace = parsed_data_source_base_url.path
 
+        service = settings.DATA_SYNC_GAE_SERVICE
+
+        if service == 'default':
+            version_service = settings.DATA_SYNC_GAE_VERSION
+        else:
+            version_service = (
+                f'{settings.DATA_SYNC_GAE_VERSION}-dot-'
+                f'{settings.DATA_SYNC_GAE_SERVICE}'
+            )
+
         url = (
-            f'https://{settings.DATA_SYNC_GAE_VERSION}-dot-'
+            f'https://{version_service}-dot-'
             f'{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}.appspot.com'
         )
 
