@@ -1,8 +1,12 @@
 from setuptools import setup, find_packages
 
+
+with open('README.md', 'r') as f:
+    long_description = f.read()
+
 setup(
     name='django_data_sync',
-    version='0.1.0',
+    version='0.5.1',
     description='Sync database between Django backends',
     url='http://github.com/unit9/django-data-sync',
     author='Abirafdi Raditya Putra',
@@ -14,21 +18,20 @@ setup(
         'requests',
         'google-cloud-tasks==1.1.0',
         'cryptography==2.7',
-        'PyJWT==1.7.1'
+        'PyJWT==1.7.1',
+        'oidc-validators==0.5.1'
     ],
     zip_safe=False,
     python_requires=">=3.7",
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 2.1',
+        'Framework :: Django :: 2.2',
         'Intended Audience :: Developers',
-        'License :: MIT License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],

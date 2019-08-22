@@ -5,9 +5,11 @@ from django.core.serializers import sort_dependencies as _sort_dependencies
 
 from data_sync.managers import DataSyncEnhancedManager
 
+_registered_models = []
 
-# should be a tuple
-registered_models = []
+
+def get_registered_models():
+    return tuple(_registered_models)
 
 
 def register_model(natural_key, fields=None, file_fields=None):
@@ -29,7 +31,7 @@ def register_model(natural_key, fields=None, file_fields=None):
                 'default manager is not a class or subclass of '
                 'DataSyncEnhancedManager'
             )
-        registered_models.append(model)
+        _registered_models.append(model)
         return model
 
     return Model
@@ -46,7 +48,7 @@ def sort_dependencies():
         model
         for model
         in sorted_models
-        if model in registered_models
+        if model in get_registered_models()
     ]
 
     return sorted_dependencies

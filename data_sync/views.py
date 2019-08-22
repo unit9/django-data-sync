@@ -3,13 +3,14 @@ import json
 import logging
 import traceback
 
+import oidc_validators
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.http import JsonResponse
 from django.views import View
 
 import data_sync
-from data_sync import models, oidc
+from data_sync import models
 
 url_validator = URLValidator()
 
@@ -99,8 +100,9 @@ class RunDataSyncGAECloudTasks(View):
         oidc_token = oidc_token.split(' ')[1]  # strip Bearer
 
         try:
-            oidc.Google.validate(
+            oidc_validators.Google.validate(
                 token=oidc_token,
+                email=settings.GAE_DATA_SYNC_SERVICE_ACCOUNT_EMAIL,
                 audience=models.DataPull.get_cloud_task_handler_url(
                     data['data_source_base_url']
                 )

@@ -1,4 +1,3 @@
-##### This document is still in WIP
 # Django Data Sync
 
 Enables you to sync insensitive data between environments with any Django 
@@ -10,28 +9,22 @@ interface.
 - enables you to sync insensitive data between the same Django environments 
   (as long the model definitions are the same) directly from admin interface 
 - relation fields are supported (ManyToMany needs to be tested)
+- synchronous sync or in background (only Cloud Tasks is supported)
 
 TO BE ADDED
 
 - ~~add support for ImageField and FileField~~ DONE
-- support multiple tasks queues, current plan is to support GCP Cloud Tasks and 
-    dramatiq (default is sync)
+- ~~support multiple tasks queues, current plan is to support GCP Cloud Tasks~~ DONE
 
 MIGHT GET ADDED
 
 - compare data in JSON for audit purpose
+- add support for another tasks queues so that is cloud platform agnostic
 
-## Disclaimer (IMPORTANT)
-
-The original codebase run in production projects twice.
-This is an adaptation of the original codebase into a decoupled library, thus
-haven't yet gone into production.
 
 ## Installation
 
-Will not hosted on PyPI (yet).
-
-    pip install git+https://github.com/unit9/django-data-sync
+    pip install django-data-sync
    
 
 add `data_sync` to your `INSTALLED_APPS`
@@ -212,7 +205,7 @@ When the code is deployed to GAE (and GAE only, flex and kube not supported yet)
 
 ## Compatibility
 
-Python 3.7, Django 2.1 and up
+Python 3.7, Django 2.2 and up
 
 ## Testing
 
