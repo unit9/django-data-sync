@@ -178,8 +178,9 @@ which you should fill the optionals below.
 
     DATA_SYNC_SERVICE_ACCOUNT_EMAIL
     
-Defaults to ''. You need to fill this with GCP service account. You can use
-GAE default service account. It is needed for OIDC validation as recommended
+Defaults to `` (empty string). You need to fill this with GCP service account.
+You can use GAE default service account.
+It is needed for OIDC validation as recommended
 by GCP.
     
     DATA_SYNC_FORCE_SYNC
