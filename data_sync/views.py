@@ -58,7 +58,7 @@ class RunDataSyncGAECloudTasks(View):
 
         debugging_data = copy.deepcopy(data)
         logger.debug(
-            f'Incoming data pull Cloud Tasks request. Data {data} Headers: {request.headers}'  # noqa
+            f'Incoming data pull Cloud Tasks request. Data {debugging_data} Headers: {request.headers}'  # noqa
         )
 
         if not all(key in data for key in ('data_pull_id', 'data_source_base_url')):  # noqa
@@ -102,7 +102,7 @@ class RunDataSyncGAECloudTasks(View):
         try:
             oidc_validators.Google.validate(
                 token=oidc_token,
-                email=settings.GAE_DATA_SYNC_SERVICE_ACCOUNT_EMAIL,
+                email=settings.DATA_SYNC_SERVICE_ACCOUNT_EMAIL,
                 audience=models.DataPull.get_cloud_task_handler_url(
                     data['data_source_base_url']
                 )

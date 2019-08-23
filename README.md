@@ -15,6 +15,7 @@ TO BE ADDED
 
 - ~~add support for ImageField and FileField~~ DONE
 - ~~support multiple tasks queues, current plan is to support GCP Cloud Tasks~~ DONE
+- add authorization and authentication at data export endpoint
 
 MIGHT GET ADDED
 
@@ -93,7 +94,6 @@ To get Data Sync working, you need to register the models that want to be
 synced.
 **Only register insensitive models e.g. copy. Never sync sensitive 
 models e.g. User as it can expose very sensitive data**.
-Authentication and authorization support might get added in the future.
 
 To register the models, you need to decorate them and use custom managers.
 
