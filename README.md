@@ -166,7 +166,7 @@ else.
 When the code is deployed to GAE (and GAE only, flex and kube not supported yet),
 `data_sync` automatically uses Cloud Tasks with the queue id of `data_sync`.
 
-### Settings and Configuration (WIP)
+### Settings and Configuration
 
 Data sync should work without additional settings 
 (if using synchronous mode which is the default).
