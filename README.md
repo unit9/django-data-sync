@@ -1,8 +1,19 @@
 # Django Data Sync
 
-Enables you to sync insensitive data between environments with any Django 
-backends (as long the model definitions are the same) directly from admin 
-interface.
+Enables you to sync insensitive data (including FileField) between 
+environments with any Django backends (as long the model definitions are the
+same) directly from admin interface.
+
+## DISCLAIMER
+
+There are no rigorous tests, yet. I haven't got the chance explored how it 
+behaves with complex relationships.
+So far, it has been used in two production grade
+projects where the models are not too complex
+(ManyToMany is not yet properly tested).
+
+Please use this at your own risk of data lost when syncing,
+or you can do rigorous testing at your development phase.
 
 ## Features
 
@@ -16,6 +27,8 @@ TO BE ADDED
 - ~~add support for ImageField and FileField~~ DONE
 - ~~support multiple tasks queues, current plan is to support GCP Cloud Tasks~~ DONE
 - add authorization and authentication at data export endpoint
+- add tests, since it's not possible to test with two Django servers locally 
+    (or there is?), I have to think how to implement this correctly
 
 MIGHT GET ADDED
 
