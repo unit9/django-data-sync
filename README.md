@@ -6,7 +6,7 @@ same) directly from admin interface.
 
 ## DISCLAIMER
 
-There are no rigorous tests, yet. I haven't got the chance explored how it 
+There are no rigorous tests, yet. I haven't got the chance to explore how it 
 behaves with complex relationships.
 So far, it has been used in two production grade
 projects where the models are not too complex
