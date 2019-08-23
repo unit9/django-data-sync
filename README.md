@@ -161,21 +161,51 @@ attribute name i.e. `objects` to use DataSyncEnhancedManager.
 DataSyncEnhancedManager just adds a `get_by_natural_key method` and no other 
 else.
 
+### Worker tasks
+
+When the code is deployed to GAE (and GAE only, flex and kube not supported yet),
+`data_sync` automatically uses Cloud Tasks with the queue id of `data_sync`.
+
 ### Settings and Configuration (WIP)
 
-DATA_SYNC_FORCE_SYNC
+Data sync should work without additional settings 
+(if using synchronous mode which is the default).
 
-DATA_SYNC_CLOUD_TASKS_QUEUE_ID
+If you are deploying to GAE, it automatically uses Cloud Tasks, 
+which you should fill the optionals below. 
 
-DATA_SYNC_CLOUD_TASKS_LOCATION
+#### Optionals
 
-DATA_SYNC_GOOGLE_CLOUD_PROJECT GOOGLE_CLOUD_PROJECT
+    DATA_SYNC_SERVICE_ACCOUNT_EMAIL
+    
+Defaults to ''. You need to fill this with GCP service account. You can use
+GAE default service account. It is needed for OIDC validation as recommended
+by GCP.
+    
+    DATA_SYNC_FORCE_SYNC
 
-DATA_SYNC_GAE_VERSION GAE_VERSION
+Defaults to `False`. Set this to `True` if you want to use synchronous
+when deployed to GAE.
 
-#### Mandatory
+    DATA_SYNC_CLOUD_TASKS_QUEUE_ID
 
-DATA_SYNC_SERVICE_ACCOUNT_EMAIL
+Defaults to `data_sync`
+
+    DATA_SYNC_CLOUD_TASKS_LOCATION
+    
+Defaults to `europe-west1`
+
+    DATA_SYNC_GOOGLE_CLOUD_PROJECT
+    
+Defaults to value of env var of `GOOGLE_CLOUD_PROJECT`.
+
+    DATA_SYNC_GAE_VERSION
+
+Defaults to value of env var of `GAE_VERSION`, which is already set by GAE.
+
+    DATA_SYNC_GAE_SERVICE
+    
+Defaults to value of env var of `GAE_SERVICE`, which is already set by GAE.
 
 ### Data Source
 
@@ -197,11 +227,6 @@ Do not include endslash.
 ### The Sync
 
 To do a sync, simply create a Data Pull
-
-### Worker tasks
-
-When the code is deployed to GAE (and GAE only, flex and kube not supported yet),
-`data_sync` automatically uses Cloud Tasks with the queue id of `data_sync`.
 
 ## Compatibility
 
