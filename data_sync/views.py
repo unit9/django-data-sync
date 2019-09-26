@@ -109,7 +109,7 @@ class RunDataSyncGAECloudTasks(View):
             )
         except Exception as e:
             traceback.format_exc()
-            logger.error(e)
+            logger.error(e, exc_info=True)
             errors = {'errors': 'Failed to validate OIDC'}
             return JsonResponse(data=errors, status=400)
 
@@ -117,7 +117,7 @@ class RunDataSyncGAECloudTasks(View):
             data_sync.run(data['data_source_base_url'])
         except Exception as e:
             traceback.format_exc()
-            logger.error(e)
+            logger.error(e, exc_info=True)
             data_pull.status = 'FAILED'
         else:
             data_pull.status = 'SUCCEED'

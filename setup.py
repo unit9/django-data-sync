@@ -6,8 +6,10 @@ with open('README.md', 'r') as f:
 
 setup(
     name='django_data_sync',
-    version='0.5.1',
+    version='0.5.2',
     description='Sync database between Django backends',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='http://github.com/unit9/django-data-sync',
     author='Abirafdi Raditya Putra',
     author_email='raditya.putra@unit9.com',
