@@ -34,29 +34,13 @@ def get_export_request_headers():
     } if settings.DATA_SYNC_EXPORT_TOKEN else None
 
 
-def pull(data_source_url):
+def pull_data(data_source_url):
     """
     :param data_source_url: env_url from DataSource
     :return: tuple of exported data
     """
     url = f'{data_source_url}/{url_constants.EXPORT}'
 
-    try:
-        # will convert to python list of serialized objects strings
-        data = requests.get(url, headers=get_export_request_headers()).json()
-    except Exception as e:
-        raise GrabExportError()
-    return data
-
-
-def pull_files(data_source_url):
-    """
-    The returned data is NOT django's deserializer frinedly, since
-    the value of file fields are URLs instead of just the filenames
-    :param data_source_url: env_url from DataSource
-    :return: tuple of exported data
-    """
-    url = f'{data_source_url}/{url_constants.EXPORT_FILES_CONFIGURATION}'
     try:
         # will convert to python list of serialized objects strings
         data = requests.get(url, headers=get_export_request_headers()).json()
@@ -118,16 +102,17 @@ def files_sync(data_source_base_url):
     Download all the files from source env to target env and save it
     """
     media_base_url = requests.get(
-        f'{data_source_base_url}/{url_constants.EXPORT_FILES_CONFIGURATION}'
+        f'{data_source_base_url}/{url_constants.EXPORT_FILES_CONFIGURATION}',
+        headers=get_export_request_headers()
     ).json()['media_base_url']
 
     for Model in data_sync.registration.sort_dependencies():
         if not Model._data_sync_file_fields:
             continue
 
-        objects = Model.objects.all()
+        qs = Model.objects.all().only(Model._data_sync_file_fields)
 
-        for obj in objects:
+        for obj in qs.iterator():
             for file_field_name in Model._data_sync_file_fields:
                 file_field = getattr(obj, file_field_name, None)
                 if file_field is None:
@@ -149,7 +134,7 @@ def run(data_source_base_url, is_generate_compare_data=False):
     Run the data sync process, returns compare data to be saved to DataPull
     for audit/history purposes
     """
-    pulled_data = pull(data_source_base_url)
+    pulled_data = pull_data(data_source_base_url)
 
     if is_generate_compare_data:
         raise NotImplementedError
