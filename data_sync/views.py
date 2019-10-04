@@ -18,15 +18,29 @@ url_validator = URLValidator()
 logger = logging.getLogger('django.data_sync')
 
 
-class DataSyncExportAPIView(View):
+class AuthTokenProtectedMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+        if settings.DATA_SYNC_EXPORT_TOKEN:
+            auth = request.headers.get('Authorization', '')
+            try:
+                auth, token = auth.split(' ')
+            except ValueError:
+                return JsonResponse(data={}, status=401)
+            if token != settings.DATA_SYNC_EXPORT_TOKEN:
+                return JsonResponse(data={}, status=401)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DataSyncExportAPIView(AuthTokenProtectedMixin, View):
     """Export insensitive data that are meant to be synced between env"""
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         data = data_sync.export()
         return JsonResponse(data, safe=False)
 
 
-class DataSyncExportFilesConfigurationView(View):
+class DataSyncExportFilesConfigurationView(AuthTokenProtectedMixin, View):
     """
     Export insensitive settings.
 
@@ -34,8 +48,8 @@ class DataSyncExportFilesConfigurationView(View):
     the files.
     """
 
-    # nice to have, move the logic to data_sync module
-    def get(self, request):
+    # TODO nice to have, move the logic to data_sync module
+    def get(self, request, *args, **kwargs):
         if settings.DEFAULT_FILE_STORAGE == 'storages.backends.gcloud.GoogleCloudStorage':  # noqa
             # this string is hardcoded in google cloud storage library anyway
             base_url = 'https://storage.googleapis.com/{}'.format(settings.GS_BUCKET_NAME)  # noqa

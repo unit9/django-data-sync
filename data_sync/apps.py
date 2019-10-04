@@ -25,8 +25,9 @@ class DataSyncConfig(AppConfig):
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_QUEUE_ID', 'data-sync')
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_LOCATION', 'europe-west1')
 
-        settings.setdefault('DATA_SYNC_GOOGLE_CLOUD_PROJECT', os.getenv('GOOGLE_CLOUD_PROJECT', ''))  # noqa
-        settings.setdefault('DATA_SYNC_GAE_VERSION', os.getenv('GAE_VERSION', ''))  # noqa
+        settings.setdefault('DATA_SYNC_GOOGLE_CLOUD_PROJECT', os.getenv('GOOGLE_CLOUD_PROJECT', ''))  # nopep8
+        settings.setdefault('DATA_SYNC_GAE_VERSION', os.getenv('GAE_VERSION', ''))  # nopep8
         settings.setdefault('DATA_SYNC_GAE_SERVICE', os.getenv('GAE_SERVICE')),
 
-        settings.setdefault('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', os.getenv('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', ''))  # noqa
+        settings.setdefault('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', '')
+        settings.setdefault('DATA_SYNC_EXPORT_TOKEN', '')

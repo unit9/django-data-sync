@@ -15,6 +15,9 @@ projects where the models are not too complex
 Please use this at your own risk of data lost when syncing,
 or you can do rigorous testing at your development phase.
 
+Export can be protected with Auth Token, but I still encourage you to not
+sync sensitive data.
+
 ## Features
 
 - enables you to sync insensitive data between the same Django environments 
@@ -24,11 +27,12 @@ or you can do rigorous testing at your development phase.
 
 TO BE ADDED
 
-- ~~add support for ImageField and FileField~~ DONE
-- ~~support multiple tasks queues, current plan is to support GCP Cloud Tasks~~ DONE
-- add authorization and authentication at data export endpoint
-- add tests, since it's not possible to test with two Django servers locally 
-    (or there is?), I have to think how to implement this correctly
+- ~~add support for ImageField and FileField~~ done
+- ~~support multiple tasks queues, current plan is to support GCP Cloud Tasks~~ done
+- ~~add authorization and authentication at data export endpoint~~ done
+- ~~add tests, since it's not possible to test with two Django servers locally 
+    (or there is?), I have to think how to implement this correctly~~
+    TODO Yes, django-extensions supports spawning django server
 
 MIGHT GET ADDED
 
@@ -189,12 +193,17 @@ which you should fill the optionals below.
 
 #### Optionals
 
+    DATA_SYNC_EXPORT_TOKEN
+
+Defaults to empty str which means export endpoints are public.
+Set this value to protect export endpoints.
+
     DATA_SYNC_SERVICE_ACCOUNT_EMAIL
     
-Defaults to `` (empty string). You need to fill this with GCP service account.
-You can use GAE default service account.
-It is needed for OIDC validation as recommended
-by GCP.
+Defaults to `` (empty string). You need to fill this with a GCP service 
+accounts email.
+You can use the GAE default service account's email.
+It is needed for OIDC validation as recommended by GCP.
     
     DATA_SYNC_FORCE_SYNC
 
@@ -211,7 +220,8 @@ Defaults to `europe-west1`
 
     DATA_SYNC_GOOGLE_CLOUD_PROJECT
     
-Defaults to value of env var of `GOOGLE_CLOUD_PROJECT`.
+Defaults to value of env var of `GOOGLE_CLOUD_PROJECT`, which is already set 
+by GAE.
 
     DATA_SYNC_GAE_VERSION
 

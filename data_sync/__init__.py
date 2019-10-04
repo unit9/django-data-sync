@@ -1,15 +1,16 @@
 from collections import defaultdict
 from io import BytesIO
 
+from django.conf import settings
 from django.core import serializers
 from django.core.files import File
+
+import requests
 
 import data_sync.managers
 from data_sync.exceptions import GrabExportError
 from data_sync.registration import register_model
 from data_sync import url_constants
-
-import requests
 
 
 default_app_config = 'data_sync.apps.DataSyncConfig'
@@ -26,15 +27,23 @@ That's why there's no logic to handle changed objects
 """
 
 
+def get_export_request_headers():
+    # TODO find how lazy settings works so this can be moved to module level
+    return {
+        'Authorization': f'Token {settings.DATA_SYNC_EXPORT_TOKEN}'
+    } if settings.DATA_SYNC_EXPORT_TOKEN else None
+
+
 def pull(data_source_url):
     """
     :param data_source_url: env_url from DataSource
     :return: tuple of exported data
     """
     url = f'{data_source_url}/{url_constants.EXPORT}'
+
     try:
         # will convert to python list of serialized objects strings
-        data = requests.get(url).json()
+        data = requests.get(url, headers=get_export_request_headers()).json()
     except Exception as e:
         raise GrabExportError()
     return data
@@ -50,7 +59,7 @@ def pull_files(data_source_url):
     url = f'{data_source_url}/{url_constants.EXPORT_FILES_CONFIGURATION}'
     try:
         # will convert to python list of serialized objects strings
-        data = requests.get(url).json()
+        data = requests.get(url, headers=get_export_request_headers()).json()
     except Exception as e:
         raise GrabExportError()
     return data
@@ -124,7 +133,7 @@ def files_sync(data_source_base_url):
                 if file_field is None:
                     continue
 
-                r = requests.get('{}/{}'.format(media_base_url, file_field.name))  # noqa
+                r = requests.get(f'{media_base_url}/{file_field.name}')
                 if not str(r.status_code).startswith('2'):
                     continue
 
