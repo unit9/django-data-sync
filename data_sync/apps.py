@@ -22,6 +22,9 @@ class DataSyncConfig(AppConfig):
         # tasks
         settings.setdefault('DATA_SYNC_FORCE_SYNC', False)
 
+        settings.setdefault('DATA_SYNC_EXPORT_TOKEN', '')
+
+        # GAE specifics
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_QUEUE_ID', 'data-sync')
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_LOCATION', 'europe-west1')
 
@@ -30,4 +33,3 @@ class DataSyncConfig(AppConfig):
         settings.setdefault('DATA_SYNC_GAE_SERVICE', os.getenv('GAE_SERVICE')),
 
         settings.setdefault('DATA_SYNC_SERVICE_ACCOUNT_EMAIL', '')
-        settings.setdefault('DATA_SYNC_EXPORT_TOKEN', '')

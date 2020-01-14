@@ -12,3 +12,7 @@ def is_in_gae():
 
 def is_in_kube():
     raise NotImplementedError
+
+
+def is_in_aws():
+    raise NotImplementedError

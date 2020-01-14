@@ -1,18 +1,12 @@
-import json
 import logging
-from urllib.parse import urlparse
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-from google.cloud import tasks_v2beta3
-
 import data_sync
-from data_sync import GrabExportError
+from data_sync import GrabExportError, gcp
 from data_sync import runtime_utils
-from data_sync import url_constants
 
 
 logger = logging.getLogger('django.data_sync')
@@ -78,88 +72,16 @@ class DataPull(TimeStampedModel):
                   ', please do another sync'
     )
 
-    @staticmethod
-    def get_cloud_task_handler_url(data_source_base_url):
-        # WON'T WORK LOCALLY
-
-        # since data sync urls can be registered inside another namespace
-        # we can't reverse it reliably
-        # however, we can infer it from the data_source_base_url
-        parsed_data_source_base_url = urlparse(data_source_base_url)
-
-        project_dependent_namespace = parsed_data_source_base_url.path
-
-        service = settings.DATA_SYNC_GAE_SERVICE
-
-        if service == 'default':
-            version_service = settings.DATA_SYNC_GAE_VERSION
-        else:
-            version_service = (
-                f'{settings.DATA_SYNC_GAE_VERSION}-dot-'
-                f'{settings.DATA_SYNC_GAE_SERVICE}'
-            )
-
-        url = (
-            f'https://{version_service}-dot-'
-            f'{settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT}.appspot.com'
-        )
-
-        url += project_dependent_namespace
-
-        url += f'/{url_constants.RUN_DATA_SYNC_GAE_CLOUD_TASKS}'
-
-        return url
-
-    @staticmethod
-    def _create_run_data_sync_task(data_pull_id, data_source_base_url):
-        """
-        Calls self version to run data sync
-        """
-        client = tasks_v2beta3.CloudTasksClient()
-
-        parent = client.queue_path(
-            settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT,
-            settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
-            settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
-        )
-
-        data = {
-            'data_pull_id': data_pull_id,
-            'data_source_base_url': data_source_base_url
-        }
-        encoded_data = json.dumps(data).encode()
-
-        target_url = DataPull.get_cloud_task_handler_url(data_source_base_url)
-
-        task = {
-            'http_request': {
-                'http_method': 'POST',
-                'url': target_url,
-                'body': encoded_data,
-                'oidc_token': {
-                    'service_account_email': settings.DATA_SYNC_SERVICE_ACCOUNT_EMAIL  # noqa
-                }
-            },
-        }
-
-        response = client.create_task(parent, task)
-
-        logger.info(
-            f'Data pull task initiated. ID: {data_pull_id} '
-            f'SOURCE_URL: {data_source_base_url} '
-            f'TASK URL: {target_url} '
-            f'CLOUD TASKS RESPONSE: {response}'
-        )
-
-        return response
-
     def save(self, *args, **kwargs):
         self.status = 'IN_PROGRESS' if not self.status else self.status
         super().save(*args, **kwargs)
 
         if self.status == 'IN_PROGRESS':
             if runtime_utils.is_in_gae():
-                self._create_run_data_sync_task(self.id, self.data_source.env_url)
+                gcp.task_queues.create_run_data_sync_task(
+                    data_pull_id=self.id,
+                    data_source_base_url=self.data_source.env_url
+                )
             else:
                 try:
                     data_sync.run(self.data_source.env_url)
