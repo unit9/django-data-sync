@@ -104,7 +104,7 @@ def create_run_data_sync_task(data_pull_id, data_source_base_url):
             'oidc_token': {
                 'service_account_email': settings.DATA_SYNC_SERVICE_ACCOUNT_EMAIL
             }
-        },
+        }
     }
 
     client = tasks_v2.CloudTasksClient()

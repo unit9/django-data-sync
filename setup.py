@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
-        'google-cloud-tasks==1.2.1',
+        'google-cloud-tasks==1.3.0',
         'cryptography==2.7',
         'PyJWT==1.7.1',
         'oidc-validators==0.5.2'
