@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from django.conf import settings
 from google.api_core.exceptions import NotFound
 
-from google.cloud import tasks_v2beta3
+from google.cloud import tasks_v2
 
 from data_sync import url_constants
 
@@ -20,7 +20,7 @@ def setup_task_queue():
     # duplicated client, kinda a problem if make them module level
     # at local which usually does not have default creds and can
     # make django starts very slow
-    client = tasks_v2beta3.CloudTasksClient()
+    client = tasks_v2.CloudTasksClient()
 
     queue_name = client.queue_path(
         settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT,
@@ -107,7 +107,7 @@ def create_run_data_sync_task(data_pull_id, data_source_base_url):
         },
     }
 
-    client = tasks_v2beta3.CloudTasksClient()
+    client = tasks_v2.CloudTasksClient()
     queue = client.queue_path(
         settings.DATA_SYNC_GOOGLE_CLOUD_PROJECT,
         settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
