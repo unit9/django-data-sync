@@ -11,6 +11,7 @@ from django.views import View
 
 import data_sync
 from data_sync import models
+from data_sync.gcp.task_queues import get_cloud_task_handler_url
 
 url_validator = URLValidator()
 
@@ -117,7 +118,7 @@ class RunDataSyncGAECloudTasks(View):
             oidc_validators.Google.validate(
                 token=oidc_token,
                 email=settings.DATA_SYNC_SERVICE_ACCOUNT_EMAIL,
-                audience=models.DataPull.get_cloud_task_handler_url(
+                audience=get_cloud_task_handler_url(
                     data['data_source_base_url']
                 )
             )
