@@ -24,6 +24,8 @@ class DataSyncConfig(AppConfig):
 
         settings.setdefault('DATA_SYNC_EXPORT_TOKEN', '')
 
+        settings.setdefault('DATA_SYNC_MEDIA_FILES_BASE_URL' '')
+
         # GAE specifics
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_QUEUE_ID', 'data-sync')
         settings.setdefault('DATA_SYNC_CLOUD_TASKS_LOCATION', 'europe-west1')

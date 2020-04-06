@@ -51,14 +51,15 @@ class DataSyncExportFilesConfigurationView(AuthTokenProtectedMixin, View):
 
     # TODO nice to have, move the logic to data_sync module
     def get(self, request, *args, **kwargs):
-        if settings.DEFAULT_FILE_STORAGE == 'storages.backends.gcloud.GoogleCloudStorage':  # noqa
+        if settings.DATA_SYNC_MEDIA_FILES_BASE_URL:
+            media_base_url = settings.DATA_SYNC_MEDIA_FILES_BASE_URL
+        elif settings.DEFAULT_FILE_STORAGE == 'storages.backends.gcloud.GoogleCloudStorage':  # noqa
             # this string is hardcoded in google cloud storage library anyway
-            base_url = 'https://storage.googleapis.com/{}'.format(settings.GS_BUCKET_NAME)  # noqa
+            media_base_url = 'https://storage.googleapis.com/{}'.format(settings.GS_BUCKET_NAME)  # noqa
         else:
-            raise NotImplementedError
-        data = {
-            'media_base_url': base_url
-        }
+            # TODO nice to have implement if using S3 django-storages?
+            raise NotImplementedError()
+        data = {'media_base_url': media_base_url}
         return JsonResponse(data)
 
 
