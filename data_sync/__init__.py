@@ -105,6 +105,8 @@ def files_sync(data_source_base_url):
         f'{data_source_base_url}/{url_constants.EXPORT_FILES_CONFIGURATION}',
         headers=get_export_request_headers()
     ).json()['media_base_url']
+    if media_base_url == 'no_files_sync':
+        return
 
     for Model in data_sync.registration.sort_dependencies():
         if not Model._data_sync_file_fields:
