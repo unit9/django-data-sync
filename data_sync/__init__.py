@@ -43,7 +43,11 @@ def pull_data(data_source_url):
 
     try:
         # will convert to python list of serialized objects strings
-        data = requests.get(url, headers=get_export_request_headers()).json()
+        data = requests.get(
+            url,
+            headers=get_export_request_headers(),
+            timeout=10
+        ).json()
     except Exception as e:
         raise GrabExportError()
     return data
@@ -103,7 +107,8 @@ def files_sync(data_source_base_url):
     """
     media_base_url = requests.get(
         f'{data_source_base_url}/{url_constants.EXPORT_FILES_CONFIGURATION}',
-        headers=get_export_request_headers()
+        headers=get_export_request_headers(),
+        timeout=10
     ).json()['media_base_url']
     if media_base_url == 'no_files_sync':
         return
@@ -120,8 +125,11 @@ def files_sync(data_source_base_url):
                 if file_field is None:
                     continue
 
-                r = requests.get(f'{media_base_url}/{file_field.name}')
-                if not str(r.status_code).startswith('2'):
+                r = requests.get(
+                    f'{media_base_url}/{file_field.name}',
+                    timeout=10
+                )
+                if not r.ok:
                     continue
 
                 bytes_content = BytesIO(r.content)

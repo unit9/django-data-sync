@@ -3,14 +3,13 @@ import json
 import logging
 import traceback
 
-import oidc_validators
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.http import JsonResponse
 from django.views import View
 
 import data_sync
-from data_sync import models
+from data_sync import models, oidc_validators
 from data_sync.gcp.task_queues import get_cloud_task_handler_url
 
 url_validator = URLValidator()
