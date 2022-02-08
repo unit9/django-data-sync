@@ -113,7 +113,12 @@ def create_run_data_sync_task(data_pull_id, data_source_base_url):
         settings.DATA_SYNC_CLOUD_TASKS_LOCATION,
         settings.DATA_SYNC_CLOUD_TASKS_QUEUE_ID
     )
-    response = client.create_task(queue, task)
+    response = client.create_task(
+        request={
+            'parent': queue,
+            'task': task
+        }
+    )
 
     logger.info(
         f'Data pull task initiated. ID: {data_pull_id} '
